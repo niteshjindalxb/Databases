@@ -1,0 +1,98 @@
+1.
+    select distinct name, rollno from student join enrollment
+    on rollno = student_rollno and course_id not in
+    (
+        select course_id from enrollment 
+            where student_rollno = 160101009 
+    );
+
+2.
+select distinct name, rollno from student join enrollment on rollno = student_rollno where not exists
+(
+    select * from
+    (select course_id from enrollment 
+    where student_rollno = 160101009) as E where course_id
+    not in    
+    (select course_id from enrollment as E2 where rollno = E2.student_rollno )
+);
+
+
+3.
+    select distinct student_rollno from
+    (
+        select student_rollno from enrollment join teaching using (course_id)
+        where lecturer_id = 1
+    ) as E1
+    inner join
+    (
+        select student_rollno from enrollment join teaching using (course_id)
+        where lecturer_id = 4
+    ) as E2
+    using (student_rollno);
+
+4.
+    (
+        select student_rollno from teaching join enrollment using(course_id)
+        where lecturer_id = 1 and student_rollno not in
+        (
+            select student_rollno from teaching join enrollment using(course_id) 
+            where lecturer_id = 2
+        )
+    )
+    union
+    (
+        select student_rollno from teaching join enrollment using(course_id)
+        where lecturer_id = 2 and student_rollno not in
+        (
+            select student_rollno from teaching join enrollment using(course_id) 
+            where lecturer_id = 1
+        )
+    );
+
+5.
+    select distinct student_rollno from enrollment e1 where course_id = 'MA101' and marks >  
+    ( 
+        select avg(marks) from enrollment e2 
+        where e2.course_id = 'ME341'
+    );
+
+6.
+    select count(id) as num_lecturer, dept_id from lecturer
+    group by dept_id;
+
+7.
+    select distinct student_rollno from enrollment as E1 where not exists
+    (
+        select * from
+        (select course_id from teaching where lecturer_id = 1) as E2 where course_id not in
+        (select course_id from enrollment as E3 where student_rollno = E1.student_rollno)       
+    );
+
+8.  
+    select course_id, avg(marks) as avg_marks, dept_id
+    from enrollment join course on course_id = id
+    group by course_id
+    order by dept_id;
+
+9.
+    select course_id from enrollment as E1 join course as C1 on E1.course_id = C1.id 
+    where
+    (
+        select avg(marks) from enrollment join course on course_id = id
+        where course_id = E1.course_id
+    ) 
+    >= all
+    (
+        select avg(marks) from enrollment join course on course_id = id
+        group by course_id
+        having dept_id = C1.dept_id
+    );
+
+10.
+    select count(E1.grade), E1.grade from
+    (
+        select ( case when marks < 40 then 'F' when marks >= 40 and marks < 70 then 'B' else 'A' end) as grade, student_rollno
+        from enrollment
+    ) as E1
+    group by E1.grade
+    order by E1.grade;

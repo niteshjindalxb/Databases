@@ -1,0 +1,99 @@
+1.
+create index marks_index on enrollment(marks);
+
+select student_rollno from enrollment where course_id = 'MA101'
+and marks > 
+(
+    select avg(marks) from enrollment where course_id = 'ME341' 
+);
+
+
+2.
+create view course_view as select course_id from enrollment where student_rollno = 160101009;
+
+3.
+delimiter $$
+create trigger correct_mark before update on enrollment
+for each row
+begin
+if new.marks < 0 then
+set new.marks = 0;
+elseif new.marks > 100 then
+set new.marks = 100;
+end if;
+end;$$
+
+delimiter $$
+create trigger correct_mark_insert before insert on enrollment
+for each row
+begin
+if new.marks < 0 then
+set new.marks = 0;
+elseif new.marks > 100 then
+set new.marks = 100;
+end if;
+end;$$
+
+delimiter ;
+
+4.
+alter table enrollment add column attendance int;
+update enrollment set attendance = 75 where student_rollno = 160101009 and course_id = 'MA101';
+update enrollment set attendance = 80 where student_rollno = 160101009 and course_id = 'ME341';
+update enrollment set attendance = 50 where student_rollno = 160101084 and course_id = 'ME101';
+
+5.
+create index roll_course_index on enrollment(student_rollno, course_id );
+
+select distinct name, rollno from student join enrollment on rollno = student_rollno where not exists
+(
+    select * from
+    (select course_id from enrollment 
+    where student_rollno = 160101009) as E where course_id
+    not in    
+    (select course_id from enrollment as E2 where rollno = E2.student_rollno )
+);
+
+6.
+create index prefix_name on student(name(5));
+
+select distinct name, rollno from student join enrollment on rollno = student_rollno where 
+substring(name, 1, 5) in (select substring(name, 1, 5) from student where rollno = 160101009) and
+not exists
+(
+    select * from
+    (select course_id from enrollment 
+    where student_rollno = 160101009) as E where course_id
+    not in    
+    (select course_id from enrollment as E2 where rollno = E2.student_rollno )
+);
+
+7.
+    create view grade_view as select student_rollno, course_id, ( case when marks < 40 then 'F' when marks >= 40 and marks < 70 then 'B' else 'A' end) as grade
+    from enrollment where student_rollno = 160101009;
+
+    drop view grade_view;
+
+8.
+    create view enrollment_view as select * from enrollment;
+
+9.
+create table gradecard  (
+    student_rollno int,
+    course_id varchar(10),
+    grade varchar(2),
+    primary key (student_rollno, course_id),
+    foreign key (student_rollno) references enrollment(student_rollno),
+    foreign key (course_id) references enrollment(course_id)
+);
+
+    delimiter $$
+    create trigger calc_grade before insert on gradecard 
+    for each row
+    begin
+
+    set new.grade = if ( (select marks from enrollment where student_rollno = new.student_rollno and course_id = new.course_id) < 40 , 'F' , if ( (select marks from enrollment where student_rollno = new.student_rollno and course_id = new.course_id) < 70 , 'B' , 'A')); 
+
+    end;
+    $$
+    delimiter ;

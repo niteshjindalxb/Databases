@@ -1,0 +1,84 @@
+a.
+select * from student where rollno in
+(
+    select student_rollno from enrollment where course_id = 'MA101'
+);
+
+b.
+select name from student where rollno in 
+( 
+    select student_rollno from enrollment where course_id in  
+    ( 
+        select course_id from teaching where lecturer_id = 1 
+    )
+);
+
+c.
+select name from student where dept_id not in 
+( 
+    select dept_id from course where id in 
+    ( 
+        select course_id from enrollment where student_rollno = rollno 
+    )
+)
+and 
+name in (
+    select name from student where rollno in 
+    (
+        select student_rollno from enrollment
+    )
+);
+
+
+----------------
+select course_id from enrollment where student_rollno = 160101084
+and course_id in
+(
+    select id from course where dept_id not in
+    (
+        select dept_id from student where rollno = 160101084
+    )
+);
+---------------------------------------------------------------------------------------------------------------------------------------------
+f.
+select name from course where id in
+(
+    select course_id from enrollment where student_rollno = 160101084
+);
+
+g.
+select name from student where rollno in
+(
+    select student_rollno from enrollment where course_id in
+    (
+        select course_id from enrollment where student_rollno = 160101084
+    )
+);
+
+h.
+// Find student_rollno from other department
+select rollno from student where dept_id != 1
+
+// course_id enrolled by given student_rollno
+select course_id from enrollment where student_rollno in
+(
+    select rollno from student where dept_id != 1
+)
+
+// get course name from course_id
+select name from course where id in
+(
+    select course_id from enrollment where student_rollno in
+    (
+        select rollno from student where dept_id != 1
+    )
+);
+
+i.
+given - course_id
+get student_rollno with given course_id and marks > 10
+
+select name from student where rollno in
+(
+    select student_rollno from enrollment where course_id = 'MA101' and marks > 60 and marks < 90
+);
