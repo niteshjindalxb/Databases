@@ -1,5 +1,8 @@
 #include<vector>
 
+#ifndef EXTENDIBLE_HASHING_H
+#define EXTENDIBLE_HASHING_H
+
 class directory
 {
 private:
@@ -7,7 +10,7 @@ private:
     std::vector<class bucket*> node;
 public:
     directory(int global_depth = 1);
-    ~directory();
+    // ~directory();
     void increase_global_depth();
     void decrease_global_depth();
     int get_global_depth();
@@ -15,25 +18,13 @@ public:
     void add_node(class bucket *);
     void set_node(int, class bucket *);
     class bucket* get_node(int);
-    int hash(int, int);
+    int hash(int, int nbits = 0);
     void add_value(int);
     void split_directory();
     int get_size();
+    void print();
 };
 
-directory::directory(int global_depth = 1) {
-    this->global_depth = global_depth;
-    class bucket *b1 = this->get_new_bucket();
-    class bucket *b2 = this->get_new_bucket();
-    this->node.push_back(b1);
-    this->node.push_back(b2);
-}
-
-directory::~directory() {
-    for (int i = 0; i < 1<<this->global_depth; i++) {
-        delete this->node[i];
-    }
-}
 
 class bucket
 {
@@ -53,9 +44,7 @@ public:
     std::vector<int> get_values();
     int get_size();
     void empty_bucket();
+    void print();
 };
 
-bucket::bucket(int local_depth) {
-    this->local_depth = local_depth;
-    this->max_size = 2;
-}
+#endif // EXTENDIBLE_HASHING_H

@@ -2,6 +2,20 @@
 #include "extendibleHashing.h"
 using namespace std;
 
+directory::directory(int global_depth) {
+    this->global_depth = global_depth;
+    class bucket *b1 = this->get_new_bucket();
+    class bucket *b2 = this->get_new_bucket();
+    this->node.push_back(b1);
+    this->node.push_back(b2);
+}
+
+// directory::~directory() {
+//     for (int i = 0; i < 1<<this->global_depth; i++) {
+//         delete this->node[i];
+//     }
+// }
+
 void directory::increase_global_depth() {
     this->global_depth ++;
 }
@@ -14,11 +28,15 @@ int directory::get_global_depth() {
     return this->global_depth;
 }
 
-int directory::hash(int value, int nbits = 0) {
-    if (!nbits)
-        return value && (1<<nbits - 1);
+int directory::hash(int value, int nbits) {
+    // cout << value & ((1<<nbits)-1) << endl;
+    if (nbits)
+        return value & (1<<nbits) - 1;
     else
-        return value && (1<<this->global_depth - 1);
+    {
+        // cout << "global depth used for calculating hash value:\t" << this->global_depth << endl;
+        return value & (1<<this->global_depth) - 1;
+    }
 }
 
 int directory::get_size() {
@@ -31,8 +49,12 @@ class bucket* directory::get_node(int value) {
 }
 
 void directory::set_node(int node_ptr, class bucket *new_bucket) {
-    delete this->node[node_ptr];
+    // delete this->node[node_ptr];
     this->node[node_ptr] = new_bucket;
+}
+
+void directory::add_node(class bucket *new_bucket) {
+    this->node.push_back(new_bucket);
 }
 
 class bucket* directory::get_new_bucket(int local_depth) {
@@ -42,17 +64,21 @@ class bucket* directory::get_new_bucket(int local_depth) {
 
 void directory::add_value(int value) {
     class bucket* b1 = this->get_node(value);
+    // cout << "value outside = " << value << " and hash = " << this->hash(value) << "\n";
     // If bucket is not full
     if(!b1->isfull())
     {
+        // cout << "value = " << value << " and hash = " << this->hash(value) << "\n";
         b1->add_value(value);
     }
     else
         // If bucket is full
     {
+        // cout << "bucket is full\n";
         // Check if its localdepth < global depth
         if(b1->get_local_depth() < this->global_depth)
         {
+            // cout << "local_depth < global depth \n";
             // get the location of first node pointing to same bucket
             int first_node = hash(value, b1->get_local_depth()+1);
             // get new bucket with local depth = b1.local_depth + 1
@@ -88,14 +114,29 @@ void directory::add_value(int value) {
 }
 
 void directory::split_directory() {
+    // cout << "Size before splitting:\t" << this->get_size() << "\n";
     for (int i = 0; i < 1<<this->global_depth; i++) {
         this->add_node(this->node[i]);
     }
+    // cout << "Size after splitting:\t" << this->get_size() << "\n";
     // increase global depth
     this->increase_global_depth();
 }
 
+void directory::print() {
+    for (int i = 0; i < this->get_size(); i++) {
+        class bucket* b = this->get_node(i);
+        b->print();
+    }
+}
+
+
 /* Member function declaration of class bucket */
+bucket::bucket(int local_depth) {
+    this->local_depth = local_depth;
+    this->max_size = 2;
+}
+
 int bucket::get_local_depth() {
     return this->local_depth;
 }
@@ -122,7 +163,10 @@ void bucket::decrease_local_depth() {
 
 void bucket::add_value(int value) {
     if (!this->isfull())
+    {
+        cout << "added value = " << value << "\n";
         this->value.push_back(value);
+    }
     else
         cerr << "Error! Bucket overflow!\n";
 }
@@ -133,4 +177,11 @@ std::vector<int> bucket::get_values() {
 
 void bucket::empty_bucket() {
     this->value.erase(value.begin(), value.end());
+}
+
+void bucket::print() {
+    for(int i = 0; i < this->get_size(); i++) {
+        cout << this->value[i] << " ";
+    }
+    cout << endl;
 }
