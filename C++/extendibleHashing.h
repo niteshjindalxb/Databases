@@ -14,17 +14,17 @@ class directory
 {
 private:
     int global_depth;
-    std::vector<class bucket*> node;
+    std::vector<class Bucket*> bucket_list;
 public:
     directory(int global_depth = INITIAL_GLOBAL_DEPTH);
     // ~directory();
     void increase_global_depth();
     void decrease_global_depth();
     int get_global_depth();
-    class bucket* get_new_bucket(int local_depth = INITIAL_LOCAL_DEPTH);
-    void add_node(class bucket *);
-    void set_node(int, class bucket *);
-    class bucket* get_node(int);
+    class Bucket* get_new_bucket(int local_depth = INITIAL_LOCAL_DEPTH);
+    void add_bucket(class Bucket *);
+    void set_bucket(int, class Bucket *);
+    class Bucket* get_bucket(int);
     int hash(int, int nbits = 0);
     void add_value(int);
     void split_directory();
@@ -34,7 +34,7 @@ public:
 };
 
 
-class bucket
+class Bucket
 {
 private:
     int local_depth;
@@ -42,7 +42,7 @@ private:
     int max_size;
 
 public:
-    bucket(int local_depth = INITIAL_LOCAL_DEPTH);
+    Bucket(int local_depth = INITIAL_LOCAL_DEPTH);
     int get_local_depth();
     bool isfull();
     int get_max_size();
