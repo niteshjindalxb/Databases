@@ -1,8 +1,10 @@
 CC = g++
 CCFLAGS =
 
-all:	extendibleHashing.o main.o
-	$(CC) extendibleHashing.o main.o -o main
+all:	build clean
+
+build:	extendibleHashing.o main.o
+	$(CC) -g extendibleHashing.o main.o -o main
 
 main.o:	
 	$(CC) -c main.cpp

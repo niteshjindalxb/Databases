@@ -1,13 +1,14 @@
 #include <iostream>
+#include <algorithm>
 #include "extendibleHashing.h"
 using namespace std;
 
 directory::directory(int global_depth) {
     this->global_depth = global_depth;
-    class bucket *b1 = this->get_new_bucket();
-    class bucket *b2 = this->get_new_bucket();
-    this->node.push_back(b1);
-    this->node.push_back(b2);
+    for (int i = 0; i < (1<<this->global_depth); i++) {
+        class bucket *new_bucket = this->get_new_bucket();
+        this->node.push_back(new_bucket);
+    }
 }
 
 // directory::~directory() {
@@ -130,11 +131,17 @@ void directory::print() {
     }
 }
 
+bool directory::search(int key) {
+    // Get the bucket in which key may present
+    class bucket* b = this->get_node(key);
+    // search through the bucket
+    return b->search(key);
+}
 
 /* Member function declaration of class bucket */
 bucket::bucket(int local_depth) {
     this->local_depth = local_depth;
-    this->max_size = 2;
+    this->max_size = BUCKET_SIZE;
 }
 
 int bucket::get_local_depth() {
@@ -184,4 +191,9 @@ void bucket::print() {
         cout << this->value[i] << " ";
     }
     cout << endl;
+}
+
+bool bucket::search(int key) {
+    // Find in the vector
+    return find(this->value.begin(), this->value.end(), key) != value.end();
 }
