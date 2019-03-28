@@ -1,9 +1,9 @@
-#include "BTree.h"
+#include "BPlusTree.h"
 #include <iostream>
 using namespace std;
 
 int main() {
-	BTree* tree = NULL;
+	BPlusTree* tree = NULL;
 	int key,choice;
 	int numIndexPointers, numDataPointers;
 	//node* searchResult;
@@ -34,7 +34,7 @@ int main() {
 				cout << "Note:: Index pointers must be in odd number and Data pointers must be in even number" << endl;
 				exit(0);
 			}
-			tree = new BTree(numIndexPointers);
+			tree = new BPlusTree(numDataPointers, numIndexPointers);
 			break;
 
 		case 2:

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <queue>
+#include <cmath>
 #include "BPlusTree.h"
 using namespace std;
 
@@ -36,7 +37,7 @@ void BPlusTree::printBTree() {
         temp = s.front();
         s.pop();
         
-        if (temp->is_DataNode)
+        if (temp->is_DataNode())
             toDataNode(temp)->printDataNode();
         else
             toIndexNode(temp)->printIndexNode();
@@ -175,6 +176,14 @@ bool Node::is_Leaf() {
     return this->get_depth() == 0;
 }
 
+bool Node::is_DataNode() {
+    return this->is_Leaf();
+}
+
+bool Node::is_IndexNode() {
+    return !this->is_Leaf();
+}
+
 void Node::increase_depth() {
     this->depth++;
 }
@@ -237,7 +246,7 @@ void DataNode::splitNode() {
     // Create a node for right node
     class DataNode *new_node = this->get_new_DataNode(this->get_numDataPointers());
     // Get keys for the right node
-    new_node->key.insert(new_node->key.end(), this->key.begin()+this->key.size()/2, this->key.end());
+    new_node->key.insert(new_node->key.end(), this->key.begin()+ceil(this->key.size()/2.0), this->key.end());
     // Set parent of the node
     new_node->parent = parent;
     // Set depth of the new node
@@ -248,11 +257,10 @@ void DataNode::splitNode() {
     /*********** Creating a left node **************/
 
     // key needed to send to parent
-    // int key = this->key[this->key.size()/2];
-    int key = this->get_separator(this->key[this->key.size()/2 - 1], this->key[this->key.size()/2]);
+    int key = this->get_separator(this->key[ceil(this->key.size()/2.0) - 1], this->key[ceil(this->key.size()/2.0)]);
 
     // Keep this node as a left node, so delete right_keys
-    this->key.erase(this->key.begin()+this->key.size()/2, this->key.end());
+    this->key.erase(this->key.begin()+ceil(this->key.size()/2.0), this->key.end());
 
     /*********** Send the middle key to the parent **************/
 
@@ -286,6 +294,15 @@ void DataNode::splitNode() {
     new_node->parent = parent;
 }
 
+// Print Node ID, Node keys and ID of children
+void DataNode::printDataNode() {
+    cout << "ID : " << this->id << " Depth : " << this->get_depth() << "\tElements : ";
+    for(int i = 0; i < this->get_size(); i++) {
+        cout << this->key[i] << " ";
+    }
+    cout << endl;
+}
+
 /* *******************************************************************************
  * Member declarations of a IndexNode
  * *******************************************************************************/
@@ -312,6 +329,12 @@ int IndexNode::lower_bound_on_child (int key) {
 
 void* IndexNode::get_child_at_index(int index) {
     return this->child[index];
+}
+
+// Returns true if the child is DataNode
+bool IndexNode::isChildData() {
+    // Check the child[0]
+    return toNode(this->child[0])->is_DataNode();
 }
 
 // Print Node ID, Node keys and ID of children
@@ -350,9 +373,9 @@ void IndexNode::splitNode() {
     // Create a node for right node
     class IndexNode *new_node = this->get_new_IndexNode(this->get_numIndexPointers());
     // Get keys for the right node
-    new_node->key.insert(new_node->key.end(), this->key.begin()+this->key.size()/2 + 1, this->key.end());
+    new_node->key.insert(new_node->key.end(), this->key.begin()+ceil(this->key.size()/2.0) + 1, this->key.end());
     // Get child for right node
-    new_node->child.insert(new_node->child.end(), this->child.begin()+this->child.size()/2, this->child.end());
+    new_node->child.insert(new_node->child.end(), this->child.begin()+ceil(this->child.size()/2.0), this->child.end());
     // Set parent of the node
     new_node->parent = parent;
     // Set depth of the new node
@@ -363,11 +386,11 @@ void IndexNode::splitNode() {
     /*********** Creating a left node **************/
 
     // key needed to send to parent
-    int key = this->key[this->key.size()/2];
+    int key = this->key[ceil(this->key.size()/2.0)];
 
     // Keep this node as a left node, so delete right_keys and child from the current node
-    this->key.erase(this->key.begin()+this->key.size()/2, this->key.end());
-    this->child.erase(this->child.begin()+this->child.size()/2, this->child.end());
+    this->key.erase(this->key.begin()+ceil(this->key.size()/2.0), this->key.end());
+    this->child.erase(this->child.begin()+ceil(this->child.size()/2.0), this->child.end());
 
     /*********** Send the middle key to the parent **************/
 
@@ -423,25 +446,25 @@ void IndexNode::set_child_at_index(void *child, int position) {
  * */
 
 /* Main for testing purpose */
-int main(int argc, char const *argv[])
-{
-    class BPlusTree root;
-    root.insert_element(1, false);
-    root.insert_element(2, false);
-    root.insert_element(3, false);
-    root.insert_element(23, false);
-    root.insert_element(22, false);
-    root.printBTree();
-    cout << endl;
-    root.insert_element(34, false);
-    root.insert_element(263, false);
-    root.insert_element(-2, false);
-    root.insert_element(0, false);
-    root.insert_element(-23, false);
-    root.printBTree();
+// int main(int argc, char const *argv[])
+// {
+//     class BPlusTree root;
+//     root.insert_element(10, false);
+//     root.insert_element(20, false);
+//     root.insert_element(30, false);
+//     root.insert_element(40, false);
+//     root.insert_element(50, false);
+//     root.printBTree();
+//     cout << endl;
+//     root.insert_element(60, false);
+//     root.insert_element(70, false);
+//     root.insert_element(80, false);
+//     root.insert_element(90, false);
+//     root.insert_element(100, false);
+//     root.printBTree();
 
-    // Search
-    // if (root.search_element(-23) != NULL)
-    //     cout << "FOUND\n";
-    return 0;
-}
+//     // Search
+//     // if (root.search_element(-23) != NULL)
+//     //     cout << "FOUND\n";
+//     return 0;
+// }
