@@ -26,6 +26,7 @@ public:
     void setMarkerAt(int index, bool value);
     bool isMarked(int index);
     void resetMarker();
+    void readDiskFile();
 };
 
 #endif

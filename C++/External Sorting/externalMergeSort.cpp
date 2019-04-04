@@ -47,8 +47,8 @@ void ExternalMergeSort::sort(MainMemory &mainMemory, Disk &disk) {
             break;
     }
 
-    disk.display();
-    std::cout << std::endl;
+    // disk.display();
+    // std::cout << std::endl;
     
     // Now each page is sorted
     // Merge pages to sort the disk completely

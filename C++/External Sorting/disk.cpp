@@ -51,3 +51,35 @@ void Disk::resetMarker() {
         this->setMarkerAt(i, false);
     }
 }
+
+//creates DiskFile by reading input file (as records) through cin
+void Disk::readDiskFile(){
+    int count = 0;
+    int input;
+    std::vector<record> rVec;
+
+    bool flag = false;
+    
+	while(std::cin >> input){
+        flag = false;
+        record r;
+        r.setval(input);
+        rVec.push_back(r);
+		count ++;
+
+        if (count == PAGE_SIZE) {
+            Page page;
+            page.addRecordtoPage(rVec);
+            count = 0;
+            rVec.clear();
+            this->addPage(page);
+            flag = true;
+        }
+    }
+
+    if (!flag) {
+        Page page;
+        page.addRecordtoPage(rVec);
+        this->addPage(page);
+    }
+}

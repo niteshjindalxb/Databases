@@ -32,27 +32,27 @@ void MainMemory::addPagetoMemory(Page page) {
     this->emptyBit.push_back(false);
     
     // If last occupied frame is not full, add this page to this frame
-    if (this->FrameList.size() > 0) {
-        Frame lastFrame = this->FrameList[this->FrameList.size() - 1];
-        if (!lastFrame.isFull()) {
-            lastFrame.addPageToFrame(page);
-            return;
-        }
-        else {
-            // Add page to last unoccupied frame
-            Frame newFrame;
-            // std::cout << "Added new frame\n";
-            newFrame.addPageToFrame(page);
-            this->FrameList.push_back(newFrame);
-        }
-    }
-    else {
+    // if (this->FrameList.size() > 0) {
+    //     Frame lastFrame = this->FrameList[this->FrameList.size() - 1];
+    //     if (!lastFrame.isFull()) {
+    //         lastFrame.addPageToFrame(page);
+    //         return;
+    //     }
+    //     else {
+    //         // Add page to last unoccupied frame
+    //         Frame newFrame;
+    //         // std::cout << "Added new frame\n";
+    //         newFrame.addPageToFrame(page);
+    //         this->FrameList.push_back(newFrame);
+    //     }
+    // }
+    // else {
         // Add page to last unoccupied frame
         Frame newFrame;
         // std::cout << "Added new frame\n";
         newFrame.addPageToFrame(page);
         this->FrameList.push_back(newFrame);
-    }
+    // }
 }
 
 bool MainMemory::isFull() {
@@ -113,13 +113,13 @@ record MainMemory::extractMin(int &framePos, bool &empty, bool &valid) {
 std::vector<Page> MainMemory::frameToPages(Frame frame) {
     std::vector<Page> allPages;
     // Get number of pages in given frame
-    int numPages = frame.size()/this->PageSize;
+    // int numPages = frame.size()/this->PageSize;
 
-    for(size_t i = 0; i < numPages; i++) {
+    // for(size_t i = 0; i < numPages; i++) {
         Page newPage;
-        newPage.addRecordtoPage(frame.getRecordBetween(i*this->PageSize, (i+1)*this->PageSize));
+        newPage.addRecordtoPage(frame.getRecordBetween(0, frame.size()));
         allPages.push_back(newPage);
-    }
+    // }
     return allPages;
 }
 
