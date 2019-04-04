@@ -28,7 +28,7 @@ public:
     void sortFrameAt(int index);
     std::vector<Page> frameToPages(Frame frame);
     void display();
-    void makeEmpty();
+    void free();
 };
 
 #endif

@@ -1,10 +1,9 @@
 #include <vector>
 #include "externalMergeSort.h"
 
+// Using mergeSort to sort Pages in disk using mainMemory
 void ExternalMergeSort::sort(MainMemory &mainMemory, Disk &disk) {
-    // Using mergeSort to sort Pages in disk using mainMemory
 
-    int run = 0;
     // Sort each page individually
 
     // Load page from disk to mainMemory
@@ -15,8 +14,6 @@ void ExternalMergeSort::sort(MainMemory &mainMemory, Disk &disk) {
         // std::cout << " diskSize : " << disk.size() << "\n";
         for(; page_num < disk.size(); page_num++) {    
             if (mainMemory.isFull()) {
-                // std::cout << " page_num : " << page_num;
-                // std::cout << " main memory size : " << mainMemory.size();
                 break;
             }
             // std::cout << " main memory size : " << mainMemory.size();
@@ -42,11 +39,25 @@ void ExternalMergeSort::sort(MainMemory &mainMemory, Disk &disk) {
             }
         }
         
-        // Empty the mainMemory
-        mainMemory.makeEmpty();
+        // Free the mainMemory
+        mainMemory.free();
         // If end_page == disk.size() then first pass is over
         if (end_page == disk.size())
             break;
     }
     
+    // Now each page is sorted
+    // Merge pages to sort the disk completely
+    int run = 1;
+
+    while (run < disk.size()) {
+        // Assuming frame size = page size
+        // Take { mainMemory.size()-1 } pages from disk and start sorting 
+        for(size_t i = 0; i < mainMemory.size(); i++) {
+            mainMemory.addPagetoMemory(disk.getPageAt(i*run));
+        }
+
+
+        
+    }
 }

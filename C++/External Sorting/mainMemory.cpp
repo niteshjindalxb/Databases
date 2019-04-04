@@ -56,7 +56,7 @@ bool MainMemory::isFull() {
     return this->FrameList.size() >= this->numFrames;
 }
 
-void MainMemory::makeEmpty() {
+void MainMemory::free() {
     this->FrameList.erase(std::begin(this->FrameList), std::end(this->FrameList));
 }
 
