@@ -37,8 +37,15 @@ public:
         std::vector<record> subVector(this->recordList.begin()+start, this->recordList.begin()+end);
         return subVector;
     }
+    record getRecordAt(int index) {
+        return this->recordList[index];
+    }
     void display() {
         for (int i = 0; i < this->recordList.size(); i++) recordList[i].display();
+    }
+    void popFront() {
+        if (!this->recordList.empty())
+            this->recordList.erase(this->recordList.begin());
     }
 };
 

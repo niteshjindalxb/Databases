@@ -18,9 +18,11 @@ bool Disk::isFull() {
 }
 
 void Disk::addPage(Page page) {
+    // std::cout << "Disk size : " << this->size() << " and maxSize : " << this->NumPages << std::endl;
     if (this->isFull())
-        ERROR("Cannot add Page more pages. Disk is full");
+        ERROR("Cannot add more pages. Disk is full");
     this->pageList.push_back(page);
+    this->processedPage.push_back(false);
 }
 
 int Disk::size() {
@@ -33,5 +35,19 @@ void Disk::display() {
         std::cout << "Page " << i+1 << " : ";
         this->pageList[i].display();
         std::cout << "\n";
+    }
+}
+
+void Disk::setMarkerAt(int index, bool value) {
+    this->processedPage[index] = value;
+}
+
+bool Disk::isMarked(int index) {
+    return this->processedPage[index];
+}
+
+void Disk::resetMarker() {
+    for(size_t i = 0; i < this->processedPage.size(); i++) {
+        this->setMarkerAt(i, false);
     }
 }

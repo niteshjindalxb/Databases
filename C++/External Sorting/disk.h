@@ -10,9 +10,11 @@ class Disk
 private:
     int NumPages;
     std::vector<Page> pageList;
+    std::vector<bool> processedPage;
+
 public:
     Disk(int numPages = NUM_PAGES) {
-        this->NumPages = NumPages;
+        this->NumPages = numPages;
     }
 
     Page getPageAt(int index);
@@ -21,6 +23,9 @@ public:
     int size();
     bool isFull();
     void display();
+    void setMarkerAt(int index, bool value);
+    bool isMarked(int index);
+    void resetMarker();
 };
 
 #endif

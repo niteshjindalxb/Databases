@@ -25,6 +25,7 @@ int main(int argc, char const *argv[])
         page.addRecordtoPage(getRandomPage(PageSize));
         d.addPage(page);
     }
+    // d.display();
     ext.sort(mm, d);
     d.display();
     return 0;
