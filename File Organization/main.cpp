@@ -24,6 +24,7 @@ int main()
                            cin >> n;
 
                            int pageSize = 100;
+                           cin >> pageSize;
                            d = HeapFile(n, pageSize);
                            create_diskFile = true;
                        }

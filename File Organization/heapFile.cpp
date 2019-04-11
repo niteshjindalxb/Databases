@@ -33,12 +33,12 @@ int HeapFile::insertRecord(int Rid, int size) {
         if (it->canAccomodate(size)) {
             bool success = it->insertRecord(Rid, size);
             inserted = true;
-            if (success) {
+            if (!success) {
                 std::cout << "Record size exceeded Page size\n";
-                return pageNum;
+                return -1;
             }
             else
-                return -1;
+                return pageNum;
         }
     }
     
