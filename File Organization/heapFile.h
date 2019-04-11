@@ -40,7 +40,7 @@ public:
     Page (int pageSize);
     int getSlotSize();
     bool canAccomodate(int size);    
-    void insertRecord(int Rid, int size);
+    bool insertRecord(int Rid, int size);
     bool searchRecord(int Rid);
     void deleteRecord(int Rid);
     void print();
@@ -58,8 +58,8 @@ public:
 
     int getPageNum();
     void addPage(Page page);
-    void insertRecord(int Rid, int size);
-    bool deleteRecord(int Rid);
+    int insertRecord(int Rid, int size);
+    int deleteRecord(int Rid);
     bool searchRecord(int Rid); 
     void print();
 };

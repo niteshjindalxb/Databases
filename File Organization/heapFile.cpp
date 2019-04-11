@@ -21,47 +21,61 @@ void HeapFile::addPage(Page page) {
     this->heapFile.push_back(page);
 }
 
-void HeapFile::insertRecord(int Rid, int size) {
+// Returns page id in which record is inserted
+int HeapFile::insertRecord(int Rid, int size) {
     bool inserted = false;
+    int pageNum = 0;
     
     // Search over list of pages and check if it can accomodate the record
 
     for(std::list<Page>::iterator it = this->heapFile.begin(); it != this->heapFile.end(); it++) {
+        pageNum ++;
         if (it->canAccomodate(size)) {
-            it->insertRecord(Rid, size);
+            bool success = it->insertRecord(Rid, size);
             inserted = true;
-            break;
+            if (success) {
+                std::cout << "Record size exceeded Page size\n";
+                return pageNum;
+            }
+            else
+                return -1;
         }
     }
     
     // If no page can accomodate the record, create a new page
 
     if (!inserted) {
+        pageNum ++;
         // Create new page
         Page newPage(this->pageSize);
         // Insert record into this page
-        newPage.insertRecord(Rid, size);
+        bool success = newPage.insertRecord(Rid, size);
+        if (!success) {
+            std::cout << "Record size exceeded Page size\n";
+            return -1;
+        }
         // Insert it into heapfile
         this->addPage(newPage);
+        return pageNum;
     }
 }
 
-// Returns true if deleted successfully
-bool HeapFile::deleteRecord(int Rid) {
-    bool deleted = false;
+// Returns PageId from which record is deleted, if deleted successfully
+int HeapFile::deleteRecord(int Rid) {
+    int pageNum = 0;
     
     // Iterate over pages and find the record
 
     for(std::list<Page>::iterator it = this->heapFile.begin(); it != this->heapFile.end(); it++) {
+        pageNum ++;
         if (it->searchRecord(Rid)) {
             it->deleteRecord(Rid);
-            deleted = true;
-            break;
+            return pageNum;
         }
     }
     
-    // Returns if not deleted successfully
-    return deleted;
+    // Returns -1 if not deleted successfully
+    return -1;
 }
 
 bool HeapFile::searchRecord(int Rid) {
@@ -139,8 +153,12 @@ int Page::getSlotSize() {
     return SLOT_SIZE;
 }
 
-void Page::insertRecord(int Rid, int size) {
+bool Page::insertRecord(int Rid, int size) {
     int endPos = 0;
+
+    // If size exceeds maximum size
+    if (size > this->pageSize - this->getSlotSize())
+        return false;
 
     // Check if can accomodate in existing slots
     
@@ -149,7 +167,7 @@ void Page::insertRecord(int Rid, int size) {
             it->setRecordId(Rid);
             it->setOccupiedSize(size);
             it->setValidBit();
-            return;
+            return true;
         }
         endPos = it->getEndPos();
     }
@@ -165,6 +183,8 @@ void Page::insertRecord(int Rid, int size) {
 
     // Update available size in page
     this->availableSize -= size + this->getSlotSize();
+
+    return true;
 }
 
 void Page::print() {
@@ -172,6 +192,8 @@ void Page::print() {
     for(std::vector<Slot>::iterator it = this->directory.begin(); it < this->directory.end(); it++) {
         it->print();
     }
+    if (this->directory.empty())
+        std::cout << "Empty";
     std::cout << std::endl;
 }
 

@@ -40,37 +40,43 @@ int main()
                            printf("Enter Record length in bytes : ");
                            int l;
                            cin >> l;
-                           d.insertRecord(id, l);
+                           int pageId = d.insertRecord(id, l);
+                           if (pageId > 0)
+                                cout << "Record inserted in Page : " << pageId << endl;
                        }
                        else
                            printf("You can not enter Records into Pages without creating the initial HeapFile.\n");
                    }
                    break;
 
-           case 3: {
+            case 3: {   
+                        if(create_diskFile){
+                            printf("Enter Record identifier in int to delete from Pages : ");
+                            int id;
+                            cin >> id;
+                            int pageId = d.deleteRecord(id);
+                            if (pageId > 0)
+                                cout << "Record deleted from Page : " << pageId << endl;
+                            else
+                                cout << "Record is not found." << endl;
+                        }
+                        else
+                            printf("You can not delete Records without creating the initial HeapFile or without inserting few Records into it.\n");
+                    }
+                    break;
+
+            case 4: {
                        if(create_diskFile){
-                           printf("Enter Record identifier in int to delete from Pages : ");
-                           int id;
-                           cin >> id;
-                           d.deleteRecord(id);
-                       }
-                       else
-                           printf("You can not delete Records without creating the initial HeapFile or without inserting few Records into it.\n");
-                   }
-                   break;
+                            d.print();
+                        }
+                        else
+                            printf("You can not view Pages & Records without creating the initial HeapFile.\n");
+                    }
+                    break;
 
-           case 4: {
-                       if(create_diskFile){
-                           d.print();
-                       }
-                       else
-                           printf("You can not view Pages & Records without creating the initial HeapFile.\n");
-                   }
-                   break;
+            case -1: exit(0);
 
-           case -1: exit(0);
-
-           default: printf("Choice other than 1, 2, 3, 4 and -1\n");
+            default: printf("Choice other than 1, 2, 3, 4 and -1\n");
                     continue;
         }
     }
