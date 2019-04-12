@@ -23,7 +23,9 @@ public:
     int size();
     bool matchRecord(int Rid);
     void setRecordId(int Rid);
+    int getRecordId();
     void setOccupiedSize(int size);
+    int getOccupiedSize();
     int getEndPos();
     void setStartPos(int start);
     void print();
@@ -39,10 +41,11 @@ private:
 public:
     Page (int pageSize);
     int getSlotSize();
-    bool canAccomodate(int size);    
+    bool canAccomodate(int size);
     bool insertRecord(int Rid, int size);
     bool searchRecord(int Rid);
     void deleteRecord(int Rid);
+    void defragmentPage();
     void print();
 };
 
@@ -61,6 +64,8 @@ public:
     int insertRecord(int Rid, int size);
     int deleteRecord(int Rid);
     bool searchRecord(int Rid); 
+    void defragmentPage(int pageNum);
+    void defragmentHeap();
     void print();
 };
 

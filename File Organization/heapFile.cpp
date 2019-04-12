@@ -2,13 +2,15 @@
 #include <iostream>
 
 HeapFile::HeapFile(int pageSize) {
-    this->pageSize = pageSize;
+    // 4 bytes is saved for keeping "number of pages" in the page
+    this->pageSize = pageSize - 4;
 }
 
 HeapFile::HeapFile(int numPages, int pageSize) {
-    this->pageSize = pageSize;
+    // 4 bytes is saved for keeping "number of pages" in the page
+    this->pageSize = pageSize - 4;
     for(size_t i = 0; i < numPages; i++) {
-        Page newPage(pageSize);
+        Page newPage(pageSize - 4);
         this->addPage(newPage);
     }
 }
@@ -90,13 +92,38 @@ bool HeapFile::searchRecord(int Rid) {
     return false;
 }
 
+void HeapFile::defragmentPage(int PageNum) {
+    int page_it = 1;
+    
+    // Go to the required Page and defragment the page
+    for(std::list<Page>::iterator it = this->heapFile.begin(); it != this->heapFile.end(); it++) {
+        if (page_it == PageNum) {
+            it->defragmentPage();
+            return;
+        }
+        page_it ++;
+    }
+}
+
+void HeapFile::defragmentHeap() {
+
+    // Iterate over each page and defragment the page
+
+    for(std::list<Page>::iterator it = this->heapFile.begin(); it != this->heapFile.end(); it++) {
+        it->defragmentPage();
+    }
+}
+
 void HeapFile::print() {
     int pageNum = 1;
 
+    std::cout << "---------------------------------------------------------------" << "\n";
+    std::cout << "Format : < RecordId, Start, Size - Gap, Valid > \n";
     for(std::list<Page>::iterator it = this->heapFile.begin(); it != this->heapFile.end(); it++) {
         std::cout << "Page " << pageNum++ << " : ";
         it->print();
     }
+    std::cout << "---------------------------------------------------------------" << "\n";
 
     std::cout << std::endl;
 }
@@ -187,13 +214,60 @@ bool Page::insertRecord(int Rid, int size) {
     return true;
 }
 
+void Page::defragmentPage() {
+
+    // Create a temporary page and save sorted data in the temp page
+    // Copy temp page to current page
+
+    Page tempPage(this->pageSize);
+    for(int i = 0; i < this->directory.size(); i++) {
+
+        std::vector<Slot>::iterator min = this->directory.end();
+        for(std::vector<Slot>::iterator it = this->directory.begin(); it < this->directory.end(); it++) {
+            if(it->isValid()) {
+                if (min == this->directory.end()) {
+                    // std::cout << "Initialized the minimum slot ...\n";
+                    min = it;
+                    it->resetValidBit();
+                }
+                else if (min->getOccupiedSize() > it->getOccupiedSize()) {
+                    // std::cout << "Got new minimum slot ...\n";
+                    min->setValidBit();
+                    min = it;
+                    it->resetValidBit();
+                }
+                // else
+                    // std::cout << "bigger one ...\n";
+
+            }
+        }
+
+        if (min == this->directory.end())
+            break;
+        else {
+            tempPage.insertRecord(min->getRecordId(), min->getOccupiedSize());
+        }
+    }
+
+    // Copy temp page to current page
+    this->directory.clear();
+    // std::cout << "Copying ...\n";
+    // std::cout << "NewPage size ... " << tempPage.directory.size() << "\n";
+
+    this->directory.insert(this->directory.end(), tempPage.directory.begin(), tempPage.directory.end());
+    this->availableSize = tempPage.availableSize;
+}
+
 void Page::print() {
     std::cout << "Records : ";
-    for(std::vector<Slot>::iterator it = this->directory.begin(); it < this->directory.end(); it++) {
-        it->print();
-    }
     if (this->directory.empty())
         std::cout << "Empty";
+    else {
+        for(std::vector<Slot>::iterator it = this->directory.begin(); it < this->directory.end(); it++) {
+            it->print();
+        }
+    }
+        
     std::cout << std::endl;
 }
 
@@ -225,8 +299,16 @@ void Slot::setOccupiedSize(int size) {
     this->occupied_size = size;
 }
 
+int Slot::getOccupiedSize() {
+    return this->occupied_size;
+}
+
 void Slot::setRecordId(int Rid) {
     this->record_id = Rid;
+}
+
+int Slot::getRecordId() {
+    return this->record_id;
 }
 
 void Slot::setStartPos(int start_pos) {
@@ -240,7 +322,7 @@ int Slot::size() {
 void Slot::print() {
     // Print format
     // < Rid, startPos, occupiedSize - Gap, valid >
-    std::cout << "< " << this->record_id << ", " << this->start_pos << ", " << this->occupied_size << " - ";
+    std::cout << "< " << this->record_id << ", " << this->start_pos + 1 << ", " << this->occupied_size << " - ";
     std::cout << this->total_size - this->occupied_size << ", ";
     if (this->isValid()) std::cout << "True >";
     else std::cout << "False >";
