@@ -66,11 +66,12 @@ bool Transaction::isRecoverable() {
             pivot ++;
     }
 
-    // Checking if commit time exists
-    if (this->commit.find(pivot->first) == this->commit.end()) {
-        std::cout << "Commit is not present\nAborting...\n";
-        exit(EXIT_FAILURE);
-    }
+    if (pivot != this->transaction.end())
+        // Checking if commit time exists
+        if (this->commit.find(pivot->first) == this->commit.end()) {
+            std::cout << "Commit is not present\nAborting...\n";
+            exit(EXIT_FAILURE);
+        }
 
     // Check if each operation "on same resource" after pivot has commit time >= commit time of pivot
     while (pivot != this->transaction.end()) {
@@ -80,27 +81,15 @@ bool Transaction::isRecoverable() {
         int pivotResource = pivot->second.second;
         
         // Iterate over each transaction after pivot
-        auto it = pivot;
-        
-        while (it != this->transaction.end()) {
+        for (auto it = pivot; it != this->transaction.end(); it ++) {
 
             // std::cout << "Inner loop Position : " << it - this->transaction.begin() << "\n";
 
-            if (it->second.first == 'C') {
-                // Remove entry from commit data structure
-                this->commit[it->first].erase(this->commit[it->first].begin());
-                if (this->commit[it->first].empty()) {
-                    auto temp = this->commit.find(it->first);
-                    this->commit.erase(temp);
-                }
+            if (it->second.first == 'C' and it->first == pivot->first)
+                break;
+            else if (it->second.second != pivotResource)
+                continue;
 
-                it ++;
-                continue;
-            }
-            else if (it->second.second != pivotResource) {
-                it ++;
-                continue;
-            }
 
             // Checking if commit time exists
             if (this->commit.find(it->first) != this->commit.end()) {
@@ -111,8 +100,6 @@ bool Transaction::isRecoverable() {
                     
                     return false;
                 }
-
-                it ++;
             }
             else {
                 std::cout << "Commit is not present\nAborting...\n";
