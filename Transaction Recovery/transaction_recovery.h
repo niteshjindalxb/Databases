@@ -1,12 +1,12 @@
-#ifndef TRANSACTION_RECOVERY_H
-#define TRANSACTION_RECOVERY_H
-
 #include <vector>
 #include <set>
 #include <string>
 #include "resource.h"
 #include "transaction.h"
 #include "logFile.h"
+
+#ifndef TRANSACTION_RECOVERY_H
+#define TRANSACTION_RECOVERY_H
 
 // Structure of transaction management system
 class TransactionManagement
@@ -25,6 +25,8 @@ private:
     LogFile logFile;
 
 public:
+    TransactionManagement() {}
+
     // Read transaction input from stdin
     void readTransaction();
 

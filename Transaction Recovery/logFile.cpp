@@ -8,7 +8,7 @@ LogRecord::LogRecord(char operation, int t_Id, std::string res, int old_val, int
     this->newValue = new_val;
 }
 
-void LogFile::addToLogFile(char operation, int transactionId, std::string resource = "", int oldValue = -1, int newValue = -1) {
+void LogFile::addToLogFile(char operation, int transactionId, std::string resource, int oldValue, int newValue) {
     this->logFile.push_back(LogRecord(operation, transactionId, resource, oldValue, newValue));
 }
 

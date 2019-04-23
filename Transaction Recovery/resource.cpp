@@ -1,9 +1,5 @@
 #include "resource.h"
 
-Resource::Resource(std::string resourceId, int Value) {
-    this->resource[resourceId] = Value;
-}
-
 int Resource::read(std::string resourceId) {
     if (this->resource.count(resourceId))
         return this->resource[resourceId];

@@ -20,7 +20,6 @@ void TransactionManagement::readTransaction() {
     while ( std::cin >> operation ) {
         
         transactionId = -1;
-        operation = '-';
         resourceId = '-';
         value = -1;
 
@@ -49,7 +48,7 @@ void TransactionManagement::readTransaction() {
                         this->transaction.push_back(Transaction(transactionId, resourceId, operation, value));
                         break;
 
-            default :   std::cout << "Invalid Input\n";
+            default :   std::cout << "Invalid Input " << operation << " \n";
                         exit(EXIT_FAILURE);
                         break;
         }
@@ -81,7 +80,7 @@ void TransactionManagement::performTransaction() {
                         break;
 
             // Read
-            case 'R' :  int value = this->listResources.read(it->resource);
+            case 'R' :  this->listResources.read(it->resource);
                         break;
 
             // Write
