@@ -14,6 +14,7 @@ struct LogRecord
     int newValue;
 
     LogRecord(char operation, int t_Id, std::string res, int old_val, int new_val);
+    void printRecord();
 };
 
 // Structure of log file
@@ -25,6 +26,7 @@ public:
     void addToLogFile(char operation, int transactionId, std::string resource = "", int oldValue = -1, int newValue = -1);
     int getSize();
     LogRecord getRecordAt(int time);
+    void printLogFile();
 };
 
 #endif

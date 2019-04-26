@@ -1,4 +1,4 @@
-CXX = g++
+CXX = g++ -std=c++11
 CXXFLAGS = -c
 
 all:	build clean
@@ -22,4 +22,4 @@ resource:
 	$(CXX) $(CXXFLAGS) resource.cpp
 	
 clean:
-	rm -rf *.o run
+	rm -rf *.o

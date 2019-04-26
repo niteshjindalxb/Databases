@@ -16,6 +16,7 @@ public:
     int read(std::string resourceId);
     void write(std::string resourceId, int Value);
     void add(std::string resourceId, int Value);
+    void print();
 };
 
 #endif

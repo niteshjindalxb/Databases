@@ -41,6 +41,12 @@ public:
 
     // Perform recovery
     void recoverData();
+
+    // Print LogFile
+    void printLogFile();
+
+    // Print Resources
+    void printResources();
 };
 
 #endif

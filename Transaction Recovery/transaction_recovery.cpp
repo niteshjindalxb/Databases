@@ -109,7 +109,9 @@ void TransactionManagement::recoverData() {
         switch (curRecord.operation) {
             case 'S' :  this->addActiveTransaction(curRecord.transactionId);
                         break;
-            case 'C' :  this->removeActiveTransaction(curRecord.transactionId);
+            case 'C' :  // Add undo to logFile
+                        // this->logFile.addToLogFile('U', curRecord.transactionId, )
+                        this->removeActiveTransaction(curRecord.transactionId);
                         break;
             case 'W' :  this->listResources.write(curRecord.resource, curRecord.newValue);
                         break;
@@ -133,4 +135,14 @@ void TransactionManagement::recoverData() {
                 this->listResources.write(curRecord.resource, curRecord.oldValue);
         }
     }
+}
+
+// Print LogFile
+void TransactionManagement::printLogFile() {
+    this->logFile.printLogFile();
+}
+
+// Print Resources
+void TransactionManagement::printResources() {
+    this->listResources.print();
 }
